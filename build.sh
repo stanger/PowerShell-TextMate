@@ -7,7 +7,7 @@ if [ -e $BUNDLE_PATH ] ; then
 	rm -r $BUNDLE_PATH
 fi
 
-pushd TypeScript-TmLanguage
+pushd EditorSyntax
 
 git pull
 #TODO should a build be run here?

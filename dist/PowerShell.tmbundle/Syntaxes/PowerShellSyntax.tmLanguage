@@ -63,7 +63,7 @@
 		</dict>
 		<dict>
 			<key>include</key>
-			<string>#interpolatedStringContent</string>
+			<string>#subexpression</string>
 		</dict>
 		<dict>
 			<key>include</key>
@@ -101,7 +101,7 @@
 		</dict>
 		<dict>
 			<key>begin</key>
-			<string>(?&lt;!')'</string>
+			<string>['\x{2018}-\x{201B}]</string>
 			<key>beginCaptures</key>
 			<dict>
 				<key>0</key>
@@ -111,7 +111,9 @@
 				</dict>
 			</dict>
 			<key>end</key>
-			<string>'(?!')</string>
+			<string>['\x{2018}-\x{201B}]</string>
+			<key>applyEndPatternLast</key>
+			<true/>
 			<key>endCaptures</key>
 			<dict>
 				<key>0</key>
@@ -126,7 +128,7 @@
 			<array>
 				<dict>
 					<key>match</key>
-					<string>''</string>
+					<string>['\x{2018}-\x{201B}]{2}</string>
 					<key>name</key>
 					<string>constant.character.escape.powershell</string>
 				</dict>
@@ -134,9 +136,25 @@
 		</dict>
 		<dict>
 			<key>begin</key>
-			<string>\@"(?=$)</string>
+			<string>(@["\x{201C}-\x{201E}])\s*$</string>
+			<key>beginCaptures</key>
+			<dict>
+				<key>1</key>
+				<dict>
+					<key>name</key>
+					<string>punctuation.definition.string.begin.powershell</string>
+				</dict>
+			</dict>
 			<key>end</key>
-			<string>^"@</string>
+			<string>^["\x{201C}-\x{201E}]@</string>
+			<key>endCaptures</key>
+			<dict>
+				<key>0</key>
+				<dict>
+					<key>name</key>
+					<string>punctuation.definition.string.end.powershell</string>
+				</dict>
+			</dict>
 			<key>name</key>
 			<string>string.quoted.double.heredoc.powershell</string>
 			<key>patterns</key>
@@ -157,20 +175,27 @@
 		</dict>
 		<dict>
 			<key>begin</key>
-			<string>\@'(?=$)</string>
+			<string>(@['\x{2018}-\x{201B}])\s*$</string>
+			<key>beginCaptures</key>
+			<dict>
+				<key>1</key>
+				<dict>
+					<key>name</key>
+					<string>punctuation.definition.string.begin.powershell</string>
+				</dict>
+			</dict>
 			<key>end</key>
-			<string>^'@</string>
+			<string>^['\x{2018}-\x{201B}]@</string>
+			<key>endCaptures</key>
+			<dict>
+				<key>0</key>
+				<dict>
+					<key>name</key>
+					<string>punctuation.definition.string.end.powershell</string>
+				</dict>
+			</dict>
 			<key>name</key>
 			<string>string.quoted.single.heredoc.powershell</string>
-			<key>patterns</key>
-			<array>
-				<dict>
-					<key>match</key>
-					<string>''</string>
-					<key>name</key>
-					<string>constant.character.escape.powershell</string>
-				</dict>
-			</array>
 		</dict>
 		<dict>
 			<key>include</key>
@@ -214,15 +239,20 @@
 		</dict>
 		<dict>
 			<key>begin</key>
-			<string>(\$)(\()</string>
+			<string>((\$))(\()</string>
 			<key>beginCaptures</key>
 			<dict>
 				<key>1</key>
 				<dict>
 					<key>name</key>
-					<string>punctuation.definition.variable.powershell</string>
+					<string>keyword.other.substatement.powershell</string>
 				</dict>
 				<key>2</key>
+				<dict>
+					<key>name</key>
+					<string>punctuation.definition.subexpression.powershell</string>
+				</dict>
+				<key>3</key>
 				<dict>
 					<key>name</key>
 					<string>punctuation.section.group.begin.powershell</string>
@@ -388,10 +418,10 @@
 		<key>commentLine</key>
 		<dict>
 			<key>begin</key>
-			<string>(?&lt;![`\\-])#</string>
+			<string>(?&lt;![`\\-])(#)#*</string>
 			<key>captures</key>
 			<dict>
-				<key>0</key>
+				<key>1</key>
 				<dict>
 					<key>name</key>
 					<string>punctuation.definition.comment.powershell</string>
@@ -416,7 +446,7 @@
 		<key>attribute</key>
 		<dict>
 			<key>begin</key>
-			<string>(\[)\s*\b(?i)(cmdletbinding|alias|outputtype|parameter|validatenotnull|validatenotnullorempty|validatecount|validateset|allownull|allowemptycollection|allowemptystring|validatescript|validaterange|validatepattern|validatelength)\b</string>
+			<string>(\[)\s*\b(?i)(cmdletbinding|alias|outputtype|parameter|validatenotnull|validatenotnullorempty|validatecount|validateset|allownull|allowemptycollection|allowemptystring|validatescript|validaterange|validatepattern|validatelength|supportswildcards)\b</string>
 			<key>beginCaptures</key>
 			<dict>
 				<key>1</key>
@@ -469,42 +499,6 @@
 					<array>
 						<dict>
 							<key>include</key>
-							<string>#variable</string>
-						</dict>
-						<dict>
-							<key>include</key>
-							<string>#variableNoProperty</string>
-						</dict>
-						<dict>
-							<key>include</key>
-							<string>#hashtable</string>
-						</dict>
-						<dict>
-							<key>include</key>
-							<string>#scriptblock</string>
-						</dict>
-						<dict>
-							<key>include</key>
-							<string>#doubleQuotedStringEscapes</string>
-						</dict>
-						<dict>
-							<key>include</key>
-							<string>#doubleQuotedString</string>
-						</dict>
-						<dict>
-							<key>include</key>
-							<string>#type</string>
-						</dict>
-						<dict>
-							<key>include</key>
-							<string>#numericConstant</string>
-						</dict>
-						<dict>
-							<key>include</key>
-							<string>#doubleQuotedString</string>
-						</dict>
-						<dict>
-							<key>include</key>
 							<string>$self</string>
 						</dict>
 						<dict>
@@ -523,39 +517,6 @@
 									<string>keyword.operator.assignment.powershell</string>
 								</dict>
 							</dict>
-						</dict>
-						<dict>
-							<key>begin</key>
-							<string>(?&lt;!')'</string>
-							<key>beginCaptures</key>
-							<dict>
-								<key>0</key>
-								<dict>
-									<key>name</key>
-									<string>punctuation.definition.string.begin.powershell</string>
-								</dict>
-							</dict>
-							<key>end</key>
-							<string>'(?!')</string>
-							<key>endCaptures</key>
-							<dict>
-								<key>0</key>
-								<dict>
-									<key>name</key>
-									<string>punctuation.definition.string.end.powershell</string>
-								</dict>
-							</dict>
-							<key>name</key>
-							<string>string.quoted.single.powershell</string>
-							<key>patterns</key>
-							<array>
-								<dict>
-									<key>match</key>
-									<string>''</string>
-									<key>name</key>
-									<string>constant.character.escape.powershell</string>
-								</dict>
-							</array>
 						</dict>
 					</array>
 				</dict>
@@ -625,8 +586,10 @@
 							<string>keyword.operator.documentation.powershell</string>
 						</dict>
 					</dict>
+					<key>comment</key>
+					<string>these embedded doc keywords do not support arguments, must be the only thing on the line</string>
 					<key>match</key>
-					<string>^(?i:(?:\s?|#)+(\.)(COMPONENT|DESCRIPTION|EXAMPLE|EXTERNALHELP|FORWARDHELPCATEGORY|FORWARDHELPTARGETNAME|FUNCTIONALITY|INPUTS|LINK|NOTES|OUTPUTS|REMOTEHELPRUNSPACE|ROLE|SYNOPSIS))</string>
+					<string>(?:^|\G)(?i:\s*(\.)(COMPONENT|DESCRIPTION|EXAMPLE|FUNCTIONALITY|INPUTS|LINK|NOTES|OUTPUTS|ROLE|SYNOPSIS))\s*$</string>
 					<key>name</key>
 					<string>comment.documentation.embedded.powershell</string>
 				</dict>
@@ -649,8 +612,10 @@
 							<string>keyword.operator.documentation.powershell</string>
 						</dict>
 					</dict>
+					<key>comment</key>
+					<string>these embedded doc keywords require arguments though the type required may be inconsistent, they may not all be able to use the same argument match</string>
 					<key>match</key>
-					<string>(?i:\s?(\.)(PARAMETER|FORWARDHELPTARGETNAME|FORWARDHELPCATEGORY|REMOTEHELPRUNSPACE|EXTERNALHELP)\s+([a-z0-9-_]+))</string>
+					<string>(?:^|\G)(?i:\s*(\.)(EXTERNALHELP|FORWARDHELP(?:CATEGORY|TARGETNAME)|PARAMETER|REMOTEHELPRUNSPACE))\s+(.+?)\s*$</string>
 					<key>name</key>
 					<string>comment.documentation.embedded.powershell</string>
 				</dict>
@@ -662,15 +627,33 @@
 			<array>
 				<dict>
 					<key>match</key>
-					<string>`[0abnfrvt"'$`]</string>
+					<string>`[`0abefnrtv'"\x{2018}-\x{201E}$]</string>
+					<key>name</key>
+					<string>constant.character.escape.powershell</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#unicodeEscape</string>
+				</dict>
+			</array>
+		</dict>
+		<key>unicodeEscape</key>
+		<dict>
+			<key>comment</key>
+			<string>`u{xxxx} added in PowerShell 6.0</string>
+			<key>patterns</key>
+			<array>
+				<dict>
+					<key>match</key>
+					<string>`u\{(?:(?:10)?([0-9a-fA-F]){1,4}|0?\g&lt;1&gt;{1,5})}</string>
 					<key>name</key>
 					<string>constant.character.escape.powershell</string>
 				</dict>
 				<dict>
 					<key>match</key>
-					<string>""</string>
+					<string>`u(?:\{[0-9a-fA-F]{,6}.)?</string>
 					<key>name</key>
-					<string>constant.character.escape.powershell</string>
+					<string>invalid.character.escape.powershell</string>
 				</dict>
 			</array>
 		</dict>
@@ -711,7 +694,7 @@
 				</dict>
 			</array>
 		</dict>
-		<key>interpolatedStringContent</key>
+		<key>subexpression</key>
 		<dict>
 			<key>begin</key>
 			<string>\(</string>
@@ -723,8 +706,6 @@
 					<string>punctuation.section.group.begin.powershell</string>
 				</dict>
 			</dict>
-			<key>contentName</key>
-			<string>interpolated.simple.source.powershell</string>
 			<key>end</key>
 			<string>\)</string>
 			<key>endCaptures</key>
@@ -735,43 +716,52 @@
 					<string>punctuation.section.group.end.powershell</string>
 				</dict>
 			</dict>
+			<key>name</key>
+			<string>meta.group.simple.subexpression.powershell</string>
 			<key>patterns</key>
 			<array>
 				<dict>
 					<key>include</key>
 					<string>$self</string>
-				</dict>
-				<dict>
-					<key>include</key>
-					<string>#interpolation</string>
-				</dict>
-				<dict>
-					<key>include</key>
-					<string>#interpolatedStringContent</string>
 				</dict>
 			</array>
 		</dict>
 		<key>interpolation</key>
 		<dict>
 			<key>begin</key>
-			<string>(\$)(\()</string>
+			<string>(((\$)))((\())</string>
 			<key>beginCaptures</key>
 			<dict>
 				<key>1</key>
 				<dict>
 					<key>name</key>
-					<string>punctuation.definition.variable.powershell</string>
+					<string>keyword.other.substatement.powershell</string>
 				</dict>
 				<key>2</key>
 				<dict>
 					<key>name</key>
+					<string>punctuation.definition.substatement.powershell</string>
+				</dict>
+				<key>3</key>
+				<dict>
+					<key>name</key>
+					<string>punctuation.section.embedded.substatement.begin.powershell</string>
+				</dict>
+				<key>4</key>
+				<dict>
+					<key>name</key>
 					<string>punctuation.section.group.begin.powershell</string>
+				</dict>
+				<key>5</key>
+				<dict>
+					<key>name</key>
+					<string>punctuation.section.embedded.substatement.begin.powershell</string>
 				</dict>
 			</dict>
 			<key>contentName</key>
 			<string>interpolated.complex.source.powershell</string>
 			<key>end</key>
-			<string>\)</string>
+			<string>(\))</string>
 			<key>endCaptures</key>
 			<dict>
 				<key>0</key>
@@ -779,20 +769,19 @@
 					<key>name</key>
 					<string>punctuation.section.group.end.powershell</string>
 				</dict>
+				<key>1</key>
+				<dict>
+					<key>name</key>
+					<string>punctuation.section.embedded.substatement.end.powershell</string>
+				</dict>
 			</dict>
+			<key>name</key>
+			<string>meta.embedded.substatement.powershell</string>
 			<key>patterns</key>
 			<array>
 				<dict>
 					<key>include</key>
 					<string>$self</string>
-				</dict>
-				<dict>
-					<key>include</key>
-					<string>#interpolation</string>
-				</dict>
-				<dict>
-					<key>include</key>
-					<string>#interpolatedStringContent</string>
 				</dict>
 			</array>
 		</dict>
@@ -1042,7 +1031,7 @@
 						<key>0</key>
 						<dict>
 							<key>name</key>
-							<string>support.constant.automatic.powershell</string>
+							<string>support.variable.automatic.powershell</string>
 						</dict>
 						<key>1</key>
 						<dict>
@@ -1058,7 +1047,7 @@
 					<key>comment</key>
 					<string>Automatic variables are not constants, but they are read-only. In monokai (default) color schema support.variable doesn't have color, so we use constant.</string>
 					<key>match</key>
-					<string>(\$)(?i:(\$|\^|\?|_|Args|ConsoleFileName|Event|EventArgs|EventSubscriber|ForEach|Input|LastExitCode|Matches|MyInvocation|NestedPromptLevel|Profile|PSBoundParameters|PsCmdlet|PsCulture|PSDebugContext|PSItem|PSCommandPath|PSScriptRoot|PsUICulture|Pwd|Sender|SourceArgs|SourceEventArgs|StackTrace|Switch|This))((?:\.(?:\p{L}|\d|_)+)*\b)?\b</string>
+					<string>(\$)((?:[$^?])|(?i:_|Args|ConsoleFileName|Event|EventArgs|EventSubscriber|ForEach|Input|LastExitCode|Matches|MyInvocation|NestedPromptLevel|Profile|PSBoundParameters|PsCmdlet|PsCulture|PSDebugContext|PSItem|PSCommandPath|PSScriptRoot|PsUICulture|Pwd|Sender|SourceArgs|SourceEventArgs|StackTrace|Switch|This)\b)((?:\.(?:\p{L}|\d|_)+)*\b)?</string>
 				</dict>
 				<dict>
 					<key>captures</key>
@@ -1082,7 +1071,7 @@
 					<key>comment</key>
 					<string>Style preference variables as language variables so that they stand out.</string>
 					<key>match</key>
-					<string>(\$)(?i:(ConfirmPreference|DebugPreference|ErrorActionPreference|ErrorView|FormatEnumerationLimit|MaximumAliasCount|MaximumDriveCount|MaximumErrorCount|MaximumFunctionCount|MaximumHistoryCount|MaximumVariableCount|OFS|OutputEncoding|ProgressPreference|PsCulture|PSDebugContext|PSDefaultParameterValues|PSEmailServer|PSItem|PSModuleAutoloadingPreference|PSSenderInfo|PSSessionApplicationName|PSSessionConfigurationName|PSSessionOption|VerbosePreference|WarningPreference|WhatIfPreference))((?:\.(?:\p{L}|\d|_)+)*\b)?\b</string>
+					<string>(\$)(?i:(ConfirmPreference|DebugPreference|ErrorActionPreference|ErrorView|FormatEnumerationLimit|InformationPreference|LogCommandHealthEvent|LogCommandLifecycleEvent|LogEngineHealthEvent|LogEngineLifecycleEvent|LogProviderHealthEvent|LogProviderLifecycleEvent|MaximumAliasCount|MaximumDriveCount|MaximumErrorCount|MaximumFunctionCount|MaximumHistoryCount|MaximumVariableCount|OFS|OutputEncoding|PSCulture|PSDebugContext|PSDefaultParameterValues|PSEmailServer|PSItem|PSModuleAutoLoadingPreference|PSModuleAutoloadingPreference|PSSenderInfo|PSSessionApplicationName|PSSessionConfigurationName|PSSessionOption|ProgressPreference|VerbosePreference|WarningPreference|WhatIfPreference))((?:\.(?:\p{L}|\d|_)+)*\b)?\b</string>
 				</dict>
 				<dict>
 					<key>captures</key>
@@ -1257,7 +1246,7 @@
 			<array>
 				<dict>
 					<key>match</key>
-					<string>\-(?i:Modules|PSSnapin|RunAsAdministrator|ShellId|Version)</string>
+					<string>\-(?i:Modules|PSSnapin|RunAsAdministrator|ShellId|Version|Assembly|PSEdition)</string>
 					<key>name</key>
 					<string>keyword.other.powershell</string>
 				</dict>
@@ -1342,7 +1331,7 @@
 					<key>comment</key>
 					<string>Automatic variables are not constants, but they are read-only...</string>
 					<key>match</key>
-					<string>(\$)(?i:(\$|\^|\?|_|Args|ConsoleFileName|Event|EventArgs|EventSubscriber|ForEach|Input|LastExitCode|Matches|MyInvocation|NestedPromptLevel|Profile|PSBoundParameters|PsCmdlet|PsCulture|PSDebugContext|PSItem|PSCommandPath|PSScriptRoot|PsUICulture|Pwd|Sender|SourceArgs|SourceEventArgs|StackTrace|Switch|This))\b</string>
+					<string>(\$)((?:[$^?])|(?i:_|Args|ConsoleFileName|Event|EventArgs|EventSubscriber|ForEach|Input|LastExitCode|Matches|MyInvocation|NestedPromptLevel|Profile|PSBoundParameters|PsCmdlet|PsCulture|PSDebugContext|PSItem|PSCommandPath|PSScriptRoot|PsUICulture|Pwd|Sender|SourceArgs|SourceEventArgs|StackTrace|Switch|This)\b)</string>
 				</dict>
 				<dict>
 					<key>captures</key>
@@ -1366,7 +1355,7 @@
 					<key>comment</key>
 					<string>Style preference variables as language variables so that they stand out.</string>
 					<key>match</key>
-					<string>(\$)(?i:(ConfirmPreference|DebugPreference|ErrorActionPreference|ErrorView|FormatEnumerationLimit|MaximumAliasCount|MaximumDriveCount|MaximumErrorCount|MaximumFunctionCount|MaximumHistoryCount|MaximumVariableCount|OFS|OutputEncoding|ProgressPreference|PsCulture|PSDebugContext|PSDefaultParameterValues|PSEmailServer|PSItem|PSModuleAutoloadingPreference|PSSenderInfo|PSSessionApplicationName|PSSessionConfigurationName|PSSessionOption|VerbosePreference|WarningPreference|WhatIfPreference))\b</string>
+					<string>(\$)(?i:(ConfirmPreference|DebugPreference|ErrorActionPreference|ErrorView|FormatEnumerationLimit|InformationPreference|LogCommandHealthEvent|LogCommandLifecycleEvent|LogEngineHealthEvent|LogEngineLifecycleEvent|LogProviderHealthEvent|LogProviderLifecycleEvent|MaximumAliasCount|MaximumDriveCount|MaximumErrorCount|MaximumFunctionCount|MaximumHistoryCount|MaximumVariableCount|OFS|OutputEncoding|PSCulture|PSDebugContext|PSDefaultParameterValues|PSEmailServer|PSItem|PSModuleAutoLoadingPreference|PSModuleAutoloadingPreference|PSSenderInfo|PSSessionApplicationName|PSSessionConfigurationName|PSSessionOption|ProgressPreference|VerbosePreference|WarningPreference|WhatIfPreference))\b</string>
 				</dict>
 				<dict>
 					<key>captures</key>
@@ -1393,7 +1382,7 @@
 						</dict>
 					</dict>
 					<key>match</key>
-					<string>(?i:(\$|@)(global|local|private|script|using|workflow):((?:\p{L}|\d|_)+))</string>
+					<string>(?i:(\$)(global|local|private|script|using|workflow):((?:\p{L}|\d|_)+))</string>
 				</dict>
 				<dict>
 					<key>captures</key>
@@ -1561,7 +1550,7 @@
 		<key>doubleQuotedString</key>
 		<dict>
 			<key>begin</key>
-			<string>(?&lt;!(?&lt;!`)")"</string>
+			<string>["\x{201C}-\x{201E}]</string>
 			<key>beginCaptures</key>
 			<dict>
 				<key>0</key>
@@ -1571,7 +1560,9 @@
 				</dict>
 			</dict>
 			<key>end</key>
-			<string>"(?!")</string>
+			<string>["\x{201C}-\x{201E}]</string>
+			<key>applyEndPatternLast</key>
+			<true/>
 			<key>endCaptures</key>
 			<dict>
 				<key>0</key>
@@ -1594,11 +1585,13 @@
 				</dict>
 				<dict>
 					<key>include</key>
-					<string>#variable</string>
+					<string>#doubleQuotedStringEscapes</string>
 				</dict>
 				<dict>
-					<key>include</key>
-					<string>#doubleQuotedStringEscapes</string>
+					<key>match</key>
+					<string>["\x{201C}-\x{201E}]{2}</string>
+					<key>name</key>
+					<string>constant.character.escape.powershell</string>
 				</dict>
 				<dict>
 					<key>include</key>
